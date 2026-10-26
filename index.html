@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KOPIN — Landing Page Demo</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --surface: #ffffff;
+      --surface-2: #eef4ff;
+      --text: #11213c;
+      --muted: #5f6c86;
+      --primary: #1849d6;
+      --primary-2: #2c6bff;
+      --accent: #0fa37f;
+      --warning: #f2b93b;
+      --border: rgba(17,33,60,.08);
+      --shadow: 0 10px 30px rgba(18, 35, 73, 0.08);
+      --radius: 22px;
+      --radius-sm: 14px;
+      --container: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top right, rgba(44,107,255,.08), transparent 28%),
+        radial-gradient(circle at bottom left, rgba(15,163,127,.06), transparent 22%),
+        var(--bg);
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(var(--container), calc(100% - 32px)); margin: 0 auto; }
+
+    .nav-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+      background: rgba(246,248,252,.82);
+      border-bottom: 1px solid rgba(17,33,60,.06);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      box-shadow: var(--shadow);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 13px 20px;
+      font-weight: 700;
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 12px 28px rgba(24,73,214,.22);
+    }
+    .btn-secondary {
+      background: #fff;
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #0f9f7c, #13b58d);
+      color: white;
+      box-shadow: 0 12px 28px rgba(15,163,127,.22);
+    }
+
+    .hero {
+      padding: 54px 0 42px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-card, .panel {
+      background: rgba(255,255,255,.82);
+      border: 1px solid rgba(255,255,255,.65);
+      box-shadow: var(--shadow);
+      border-radius: 30px;
+    }
+
+    .hero-card {
+      position: relative;
+      padding: 38px;
+      overflow: hidden;
+      min-height: 510px;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -50px -60px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(44,107,255,.18), transparent 65%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(24,73,214,.08);
+      color: var(--primary);
+      border: 1px solid rgba(24,73,214,.1);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    h1, h2, h3 { margin: 0; letter-spacing: -.02em; }
+    h1 {
+      font-size: clamp(34px, 4.8vw, 56px);
+      line-height: 1.04;
+      margin-top: 18px;
+      max-width: 11ch;
+    }
+    .hero p.lead {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 18px);
+      max-width: 60ch;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .stat .num { font-size: 24px; font-weight: 800; }
+    .stat .label { margin-top: 6px; color: var(--muted); font-size: 13px; }
+
+    .hero-visual {
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 510px;
+    }
+
+    .mockup {
+      position: relative;
+      flex: 1;
+      overflow: hidden;
+      border-radius: 28px;
+      background:
+        linear-gradient(135deg, rgba(24,73,214,1), rgba(17, 140, 156, 0.95));
+      color: white;
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      isolation: isolate;
+    }
+
+    .mockup::before, .mockup::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,.13);
+      z-index: -1;
+      filter: blur(2px);
+    }
+    .mockup::before { width: 220px; height: 220px; right: -50px; top: -30px; }
+    .mockup::after { width: 170px; height: 170px; left: -40px; bottom: -35px; }
+
+    .phone {
+      background: rgba(255,255,255,.14);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 28px;
+      padding: 18px;
+      width: 100%;
+      max-width: 310px;
+      margin: 0 auto;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+    }
+
+    .phone-screen {
+      background: rgba(255,255,255,.96);
+      color: var(--text);
+      border-radius: 20px;
+      padding: 14px;
+      min-height: 360px;
+    }
+
+    .appbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .balance {
+      background: linear-gradient(135deg, #f5f9ff, #edf5ff);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .balance .title { font-size: 13px; color: var(--muted); }
+    .balance .amount { margin-top: 6px; font-size: 28px; font-weight: 800; }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .mini-card {
+      padding: 12px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--border);
+      box-shadow: 0 5px 15px rgba(17,33,60,.04);
+    }
+    .mini-card strong { display: block; font-size: 13px; }
+    .mini-card span { color: var(--muted); font-size: 12px; }
+
+    section { padding: 38px 0; }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    .section-head p { margin: 10px 0 0; color: var(--muted); max-width: 62ch; }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+    }
+    .icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(24,73,214,.12), rgba(15,163,127,.12));
+      color: var(--primary);
+      margin-bottom: 14px;
+      font-size: 26px;
+    }
+    .card p { color: var(--muted); margin: 10px 0 0; }
+    .chip-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+    .chip {
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .feature-band {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .feature-banner {
+      padding: 26px;
+      border-radius: 26px;
+      color: white;
+      min-height: 250px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .feature-banner.blue { background: linear-gradient(135deg, #1849d6, #1f78ff); }
+    .feature-banner.green { background: linear-gradient(135deg, #0c8d73, #13b58d); }
+    .feature-banner::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      right: -50px;
+      bottom: -50px;
+      background: rgba(255,255,255,.10);
+    }
+    .feature-banner p { color: rgba(255,255,255,.88); max-width: 44ch; }
+    .feature-list { margin-top: 18px; display: grid; gap: 10px; }
+    .feature-item {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 600;
+    }
+
+    .simulator {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; }
+    input[type="number"], select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      font: inherit;
+      outline: none;
+      background: white;
+    }
+    .input-note { color: var(--muted); font-size: 12px; }
+
+    .result-box {
+      background: linear-gradient(180deg, #12295f, #0d1f4b);
+      color: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 14px 34px rgba(18, 35, 73, 0.18);
+      display: grid;
+      align-content: start;
+      gap: 16px;
+    }
+    .result-big {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .result-sub { color: rgba(255,255,255,.74); }
+    .result-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .result-item {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .result-item .k { color: rgba(255,255,255,.7); font-size: 12px; }
+    .result-item .v { font-size: 18px; font-weight: 800; margin-top: 5px; }
+
+    .faq-list {
+      display: grid;
+      gap: 14px;
+    }
+    .faq {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: white;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .faq button {
+      width: 100%;
+      border: 0;
+      background: white;
+      text-align: left;
+      padding: 18px 20px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .faq p {
+      margin: 0;
+      padding: 0 20px 18px;
+      color: var(--muted);
+      display: none;
+    }
+    .faq.open p { display: block; }
+    .faq .symbol { color: var(--primary); font-weight: 900; }
+
+    .cta {
+      background: linear-gradient(135deg, #112963, #1849d6);
+      color: white;
+      padding: 30px;
+      border-radius: 30px;
+      box-shadow: 0 16px 36px rgba(18, 35, 73, .18);
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 20px;
+      align-items: center;
+    }
+    .cta p { color: rgba(255,255,255,.84); }
+    .cta-box {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      padding: 18px;
+      border-radius: 22px;
+    }
+
+    footer {
+      padding: 28px 0 50px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .footer-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      padding-top: 24px;
+      border-top: 1px solid rgba(17,33,60,.08);
+      margin-top: 24px;
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid, .feature-band, .simulator, .cta { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .hero-card, .hero-visual { min-height: auto; }
+      .cta { padding: 24px; }
+    }
+
+    @media (max-width: 700px) {
+      .nav { align-items: start; }
+      .nav-links { display: none; }
+      .hero-card { padding: 24px; }
+      .hero-stats { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .result-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-wrap">
+    <div class="container nav">
+      <a href="#top" class="brand">
+        <div class="brand-badge">K</div>
+        <div>
+          <div style="font-size: 18px;">KOPIN</div>
+          <div style="font-size: 12px; color: var(--muted); font-weight: 600;">Koperasi Itjen — Demo Landing Page</div>
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <a href="#manfaat">Manfaat</a>
+        <a href="#layanan">Layanan</a>
+        <a href="#simulasi">Simulasi</a>
+        <a href="#faq">FAQ</a>
+        <a href="#kontak">Kontak</a>
+        <a href="#gabung" class="btn btn-primary" style="padding: 11px 16px;">Gabung Sekarang</a>
+      </div>
+    </div>
+  </div>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-card">
+          <div class="eyebrow">✨ Solusi anggota yang praktis, modern, dan bermanfaat</div>
+          <h1>Gabung KOPIN, lebih banyak manfaatnya.</h1>
+          <p class="lead">Contoh landing page ini dibuat untuk menunjukkan bagaimana KOPIN dapat tampil lebih profesional di web: menjelaskan manfaat keanggotaan, layanan pembiayaan syariah, KOPIN Mart, serta ajakan bergabung dalam satu halaman yang rapi dan persuasif.</p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#gabung">Daftar Menjadi Anggota</a>
+            <a class="btn btn-secondary" href="#simulasi">Coba Simulasi Pembiayaan</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="num">SHU</div>
+              <div class="label">Potensi manfaat tambahan bagi anggota sesuai ketentuan koperasi.</div>
+            </div>
+            <div class="stat">
+              <div class="num">Syariah</div>
+              <div class="label">Akses pembiayaan dengan pendekatan yang lebih sesuai kebutuhan anggota.</div>
+            </div>
+            <div class="stat">
+              <div class="num">KOPIN Mart</div>
+              <div class="label">Kemudahan berbelanja kebutuhan harian di ekosistem KOPIN.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual panel">
+          <div class="mockup">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+              <div>
+                <div style="font-size:14px; opacity:.8;">Preview pengalaman anggota</div>
+                <div style="font-size:28px; font-weight:800; line-height:1.1; margin-top:6px;">Portal layanan KOPIN</div>
+              </div>
+              <div style="padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.14); font-weight:700; font-size: 13px;">Responsive</div>
+            </div>
+
+            <div class="phone">
+              <div class="phone-screen">
+                <div class="appbar">
+                  <span>Selamat datang, Kopiners</span>
+                  <span>09:00</span>
+                </div>
+
+                <div class="balance">
+                  <div class="title">Ringkasan Manfaat</div>
+                  <div class="amount">Semua layanan dalam satu tempat</div>
+                  <div class="chip-row">
+                    <span class="chip">Keanggotaan</span>
+                    <span class="chip">Pembiayaan</span>
+                    <span class="chip">KOPIN Mart</span>
+                  </div>
+                </div>
+
+                <div class="mini-grid">
+                  <div class="mini-card">
+                    <strong>Gabung Mudah</strong>
+                    <span>Akses info dan pendaftaran anggota.</span>
+                  </div>
+                  <div class="mini-card">
+                    <strong>Simulasi</strong>
+                    <span>Perkiraan angsuran cepat dan sederhana.</span>
+                  </div>
+                  <div class="mini-card">
+                    <strong>Belanja</strong>
+                    <span>Produk dan promo KOPIN Mart.</span>
+                  </div>
+                  <div class="mini-card">
+                    <strong>Hubungi Admin</strong>
+                    <span>Langsung terhubung via WhatsApp.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:12px; flex-wrap:wrap;">
+              <div style="padding:10px 14px; border-radius:999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); font-weight:700;">Tampilan Mobile Friendly</div>
+              <div style="padding:10px 14px; border-radius:999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.18); font-weight:700;">Siap untuk CTA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="manfaat">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Mengapa landing page ini berguna untuk KOPIN?</h2>
+            <p>Berbeda dengan Linktree yang terutama berfungsi sebagai kumpulan tautan, landing page dapat menjelaskan nilai KOPIN terlebih dahulu sebelum pengguna diarahkan untuk mendaftar, menghubungi admin, atau mencoba simulasi.</p>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="card">
+            <div class="icon">👥</div>
+            <h3>Keanggotaan Lebih Jelas</h3>
+            <p>Menjelaskan manfaat bergabung, siapa yang dapat mendaftar, dan langkah pendaftarannya secara ringkas namun persuasif.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🕌</div>
+            <h3>Pembiayaan Syariah</h3>
+            <p>Menampilkan penjelasan produk pembiayaan dan simulasi sederhana agar pengunjung lebih mudah memahami opsi yang tersedia.</p>
+          </div>
+          <div class="card">
+            <div class="icon">🛒</div>
+            <h3>KOPIN Mart</h3>
+            <p>Menunjukkan kehadiran layanan belanja dan promo produk unggulan sehingga halaman terasa hidup, bukan hanya informatif.</p>
+          </div>
+          <div class="card">
+            <div class="icon">📲</div>
+            <h3>Call-to-Action Kuat</h3>
+            <p>Tombol daftar, WhatsApp, dan link informasi lain ditempatkan strategis agar pengunjung tahu langkah berikutnya.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="layanan">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Contoh blok layanan utama</h2>
+            <p>Bagian ini menunjukkan bagaimana layanan KOPIN dapat dibungkus secara lebih menarik secara visual, tanpa kehilangan fokus pada informasi yang relevan.</p>
+          </div>
+        </div>
+
+        <div class="feature-band">
+          <div class="feature-banner blue">
+            <h3 style="font-size: 30px;">Keanggotaan &amp; manfaat anggota</h3>
+            <p>Anggota dapat mengakses informasi manfaat, proses pendaftaran, serta penjelasan singkat mengenai kontribusi dan potensi manfaat yang diterima sesuai ketentuan koperasi.</p>
+            <div class="feature-list">
+              <div class="feature-item">✓ Informasi pendaftaran anggota</div>
+              <div class="feature-item">✓ Penjelasan manfaat dan layanan</div>
+              <div class="feature-item">✓ Tautan cepat ke formulir / kontak admin</div>
+            </div>
+          </div>
+
+          <div class="feature-banner green">
+            <h3 style="font-size: 30px;">Pembiayaan &amp; KOPIN Mart</h3>
+            <p>Landing page juga dapat menggabungkan penjelasan layanan pembiayaan syariah serta promosi KOPIN Mart agar pengguna melihat ekosistem manfaat secara utuh.</p>
+            <div class="feature-list">
+              <div class="feature-item">✓ Simulasi pembiayaan sederhana</div>
+              <div class="feature-item">✓ Promo produk dan pengumuman KOPIN Mart</div>
+              <div class="feature-item">✓ Ajakan menghubungi admin via WhatsApp</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Struktur informasi yang bisa ditampilkan</h2>
+            <p>Isi landing page dapat dibuat singkat tetapi cukup meyakinkan. Berikut contoh jenis informasi yang biasanya paling relevan untuk KOPIN.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="card">
+            <h3>1. Hero section</h3>
+            <p>Hook singkat, subjudul yang menjelaskan manfaat, dan tombol ajakan utama seperti “Gabung Sekarang” atau “Hubungi Admin”.</p>
+            <div class="chip-row">
+              <span class="chip">Hook</span>
+              <span class="chip">CTA</span>
+              <span class="chip">Value proposition</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>2. Penjelasan manfaat</h3>
+            <p>Blok manfaat anggota, SHU, pembiayaan, dan KOPIN Mart untuk membangun pemahaman sebelum pengunjung mengambil keputusan.</p>
+            <div class="chip-row">
+              <span class="chip">Manfaat</span>
+              <span class="chip">Kepercayaan</span>
+              <span class="chip">Edukasi</span>
+            </div>
+          </div>
+          <div class="card">
+            <h3>3. CTA dan kontak</h3>
+            <p>Bagian penutup yang kuat dengan tombol daftar, link Linktree, atau WhatsApp admin supaya alurnya tidak terputus.</p>
+            <div class="chip-row">
+              <span class="chip">WhatsApp</span>
+              <span class="chip">Google Form</span>
+              <span class="chip">Linktree</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulasi">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Contoh fitur interaktif: simulasi pembiayaan</h2>
+            <p>Ini contoh sederhana untuk menunjukkan bahwa landing page bisa lebih dari sekadar halaman statis. Simulasi ini hanya ilustratif dan bukan perhitungan resmi KOPIN.</p>
+          </div>
+        </div>
+
+        <div class="simulator">
+          <div class="card">
+            <div class="form-grid">
+              <label>
+                Nominal pembiayaan
+                <input type="number" id="amountInput" value="10000000" min="1000000" step="500000" />
+                <span class="input-note">Contoh: 10.000.000</span>
+              </label>
+
+              <label>
+                Pilih tenor
+                <select id="tenorSelect">
+                  <option value="6">6 bulan</option>
+                  <option value="12" selected>12 bulan</option>
+                  <option value="18">18 bulan</option>
+                  <option value="24">24 bulan</option>
+                </select>
+              </label>
+
+              <label>
+                Margin ilustratif per bulan: <span id="marginLabel">0.80%</span>
+                <input type="range" id="marginRange" min="0.4" max="1.5" step="0.05" value="0.8" />
+                <span class="input-note">Atur untuk melihat skenario ilustrasi. Silakan ganti sesuai kebijakan aktual bila halaman ini benar-benar dipakai.</span>
+              </label>
+            </div>
+            <p class="note">Catatan: perhitungan ini menggunakan ilustrasi sederhana dengan pendekatan flat agar mudah dipahami, bukan simulasi resmi pembiayaan KOPIN.</p>
+          </div>
+
+          <div class="result-box">
+            <div>
+              <div class="result-sub">Estimasi angsuran per bulan</div>
+              <div class="result-big" id="monthlyOut">Rp0</div>
+            </div>
+
+            <div class="result-grid">
+              <div class="result-item">
+                <div class="k">Nominal pembiayaan</div>
+                <div class="v" id="principalOut">Rp0</div>
+              </div>
+              <div class="result-item">
+                <div class="k">Tenor</div>
+                <div class="v" id="tenorOut">0 bulan</div>
+              </div>
+              <div class="result-item">
+                <div class="k">Total margin ilustratif</div>
+                <div class="v" id="marginOut">Rp0</div>
+              </div>
+              <div class="result-item">
+                <div class="k">Total pembayaran</div>
+                <div class="v" id="totalOut">Rp0</div>
+              </div>
+            </div>
+
+            <a class="btn btn-success" href="#gabung">Ajukan Minat / Hubungi Admin</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Contoh FAQ</h2>
+            <p>FAQ penting untuk menjawab pertanyaan dasar pengunjung tanpa mereka harus bertanya langsung sejak awal.</p>
+          </div>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq open">
+            <button type="button">
+              <span>Apakah landing page ini menggantikan Linktree?</span>
+              <span class="symbol">−</span>
+            </button>
+            <p>Tidak harus. Justru paling ideal, Linktree tetap dipakai sebagai pusat navigasi, sedangkan landing page ini dipakai untuk halaman khusus seperti keanggotaan atau pembiayaan agar penjelasannya lebih lengkap dan persuasif.</p>
+          </div>
+
+          <div class="faq">
+            <button type="button">
+              <span>Apakah desain ini bisa disesuaikan dengan identitas visual KOPIN?</span>
+              <span class="symbol">+</span>
+            </button>
+            <p>Bisa. Warna, logo, foto, teks, tombol, bahkan struktur section dapat disesuaikan agar sejalan dengan citra KOPIN yang ingin kamu bangun.</p>
+          </div>
+
+          <div class="faq">
+            <button type="button">
+              <span>Apakah tombol-tombolnya bisa dihubungkan ke WhatsApp, Google Form, atau Linktree?</span>
+              <span class="symbol">+</span>
+            </button>
+            <p>Bisa. Pada implementasi nyata, setiap tombol tinggal diarahkan ke URL tujuan sesuai kebutuhan: WhatsApp admin, formulir pendaftaran anggota, katalog, atau halaman informasi lain.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="gabung">
+      <div class="container">
+        <div class="cta">
+          <div>
+            <h2 style="font-size: clamp(28px, 4vw, 42px); line-height:1.1;">Kalau KOPIN mau tampil lebih profesional di web, bentuknya bisa seperti ini.</h2>
+            <p style="margin-top: 14px;">Landing page ini masih berupa demo, tetapi sudah cukup untuk menunjukkan gaya tampilan, struktur informasi, serta pengalaman pengguna yang lebih kaya dibanding halaman kumpulan tautan biasa.</p>
+            <div class="hero-actions" style="margin-top:20px;">
+              <a class="btn btn-success" href="https://wa.me/6280000000000" target="_blank" rel="noopener">Hubungi Admin</a>
+              <a class="btn btn-secondary" href="https://linktr.ee/" target="_blank" rel="noopener">Buka Linktree</a>
+            </div>
+          </div>
+
+          <div class="cta-box" id="kontak">
+            <h3>Yang bisa saya buat lanjutannya</h3>
+            <p style="margin-top: 10px;">Jika kamu suka arah tampilannya, versi berikutnya bisa saya rapikan berdasarkan kebutuhan nyata KOPIN, misalnya:</p>
+            <ul style="margin: 12px 0 0; padding-left: 18px; color: rgba(255,255,255,.88);">
+              <li>landing page khusus keanggotaan,</li>
+              <li>landing page pembiayaan syariah,</li>
+              <li>portal layanan anggota sederhana,</li>
+              <li>atau versi yang terhubung langsung ke Linktree / WhatsApp / Google Form.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div><strong>KOPIN — Demo Landing Page</strong></div>
+      <div class="footer-grid">
+        <div>Contoh konsep visual dan struktur halaman untuk kebutuhan presentasi / eksplorasi.</div>
+        <div>Silakan ganti logo, nomor kontak, tautan, dan isi teks sesuai kebutuhan riil KOPIN.</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const amountInput = document.getElementById('amountInput');
+    const tenorSelect = document.getElementById('tenorSelect');
+    const marginRange = document.getElementById('marginRange');
+    const marginLabel = document.getElementById('marginLabel');
+
+    const monthlyOut = document.getElementById('monthlyOut');
+    const principalOut = document.getElementById('principalOut');
+    const tenorOut = document.getElementById('tenorOut');
+    const marginOut = document.getElementById('marginOut');
+    const totalOut = document.getElementById('totalOut');
+
+    const formatRupiah = (num) => new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0
+    }).format(num || 0);
+
+    function updateSimulation() {
+      const principal = Math.max(0, Number(amountInput.value) || 0);
+      const tenor = Number(tenorSelect.value) || 12;
+      const marginPct = Number(marginRange.value) || 0.8;
+
+      // Ilustrasi flat sederhana, bukan kalkulator resmi.
+      const totalMargin = principal * (marginPct / 100) * tenor;
+      const totalPayment = principal + totalMargin;
+      const monthly = totalPayment / tenor;
+
+      marginLabel.textContent = `${marginPct.toFixed(2)}%`;
+      principalOut.textContent = formatRupiah(principal);
+      tenorOut.textContent = `${tenor} bulan`;
+      marginOut.textContent = formatRupiah(totalMargin);
+      totalOut.textContent = formatRupiah(totalPayment);
+      monthlyOut.textContent = formatRupiah(monthly);
+    }
+
+    [amountInput, tenorSelect, marginRange].forEach(el => {
+      el.addEventListener('input', updateSimulation);
+    });
+    updateSimulation();
+
+    document.querySelectorAll('.faq').forEach((faq) => {
+      const btn = faq.querySelector('button');
+      const symbol = faq.querySelector('.symbol');
+      btn.addEventListener('click', () => {
+        const open = faq.classList.contains('open');
+        document.querySelectorAll('.faq').forEach(item => {
+          item.classList.remove('open');
+          item.querySelector('.symbol').textContent = '+';
+        });
+        if (!open) {
+          faq.classList.add('open');
+          symbol.textContent = '−';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
