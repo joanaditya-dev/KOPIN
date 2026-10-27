@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#143D34">
+  <meta name="description" content="Simulasi angsuran KOPIN untuk pembiayaan barang dan pinjaman tunai, dengan perhitungan otomatis dan rincian biaya yang transparan.">
+  <title>Simulasi Pembiayaan & Pinjaman Tunai | KOPIN — Koperasi Itjen</title>
+  <style>
+    :root {
+      --forest: #123a31;
+      --forest-deep: #0e3029;
+      --forest-light: #235849;
+      --lime: #d8f38d;
+      --cream: #f7f8f4;
+      --white: #ffffff;
+      --ink: #1b322c;
+      --muted: #708079;
+      --border: #e5eae3;
+      --accent: #25785a;
+      --shadow: 0 18px 60px rgba(20, 57, 46, .075);
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    .product-switch { display:grid; grid-template-columns:1fr 1fr; gap:13px; margin-top:24px; }
+    .product-choice { text-align:left; width:100%; border:1px solid #dce7de; background:#fff; color:var(--ink); padding:20px 23px; border-radius:19px; box-shadow:0 5px 18px rgba(20,57,46,.035); transition:background .15s, border-color .15s, box-shadow .15s; }
+    .product-choice:hover { border-color:#70ac83; }
+    .product-choice[aria-pressed="true"] { background:#eaf5e7; border-color:#3a936c; box-shadow:inset 0 0 0 1px rgba(58,147,108,.15); }
+    .product-choice .choice-title { display:block; font-weight:850; font-size:17px; letter-spacing:-.02em; }
+    .product-choice .choice-caption { display:block; margin-top:4px; font-size:12px; color:var(--muted); font-weight:450; }
+    .product-choice .choice-icon { display:inline-grid; place-items:center; width:32px; height:32px; margin-right:7px; border-radius:10px; background:#e8f2e8; color:#266e51; font-size:17px; vertical-align:middle; }
+    .product-choice[aria-pressed="true"] .choice-icon { background:#cfe9cc; }
+    .admin-fixed { margin-top:5px; padding:16px 17px; display:flex; gap:10px; justify-content:space-between; align-items:center; border:1px solid #dce7de; background:#f7faf5; border-radius:15px; }
+    .admin-fixed strong { color:var(--forest); font-size:20px; white-space:nowrap; }
+    .admin-fixed span { color:var(--muted); font-size:12px; }
+    .disclaimer-mini { margin-top:12px; font-size:12px; color:#6d7e74; line-height:1.6; }
+    .label-emphasis { font-weight:780; }
+
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font: 400 15px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #a4d96c; outline-offset: 3px; }
+    a { color: inherit; text-decoration: none; }
+    .layout { width: min(1160px, calc(100% - 48px)); margin: 0 auto; }
+    .topbar { height: 88px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 12px; }
+    .brandmark { width: 45px; height: 45px; background: var(--forest); color: white; border-radius: 14px; display: grid; place-items: center; font-weight: 900; font-size: 24px; letter-spacing: -.1em; padding-right: 3px; }
+    .brandname { font-size: 20px; font-weight: 860; letter-spacing: -.055em; line-height: 1.15; }
+    .brandname small { display: block; font-size: 10px; color: #70837a; font-weight: 700; letter-spacing: .14em; margin-top: 5px; }
+    .topnav { display: flex; gap: 22px; align-items: center; color: #5c7368; font-size: 13px; font-weight: 680; }
+    .topnav a:hover { color: var(--forest); }
+    .topnav .pill { border: 1px solid #d6e3d9; border-radius: 99px; padding: 10px 16px; background: white; }
+    .hero {
+      min-height: 258px;
+      border-radius: 29px;
+      background: radial-gradient(circle at 89% 6%, rgba(218,243,140,.19), transparent 34%), linear-gradient(115deg, var(--forest-deep), #215645);
+      color: white;
+      padding: 43px 50px 37px;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .hero::after { content:""; width: 325px; height: 325px; border: 1px solid rgba(216,243,141,.22); border-radius: 50%; position: absolute; right: -43px; top: -130px; box-shadow: 0 0 0 53px rgba(216,243,141,.04), 0 0 0 106px rgba(216,243,141,.035); z-index: -1; }
+    .hero .overline { color: var(--lime); font-size: 12px; letter-spacing: .15em; font-weight: 800; margin-bottom: 13px; }
+    h1 { margin: 0; max-width: 660px; font-size: clamp(32px, 4.1vw, 51px); letter-spacing: -.055em; line-height: 1.13; font-weight: 780; }
+    .hero p { color: #cbdfd4; max-width: 600px; margin: 16px 0 0; font-size: 15px; line-height: 1.65; }
+    .microtag { display: inline-flex; gap: 8px; align-items: center; color: #e1f6d8; border: 1px solid rgba(225,246,216,.22); background: rgba(255,255,255,.065); padding: 8px 12px; border-radius: 30px; margin-top: 22px; font-weight: 630; font-size: 12px; }
+    .microtag svg { flex-shrink: 0; }
+    .content { display: grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); gap: 22px; align-items: start; margin-top: -1px; padding-top: 28px; }
+    .sheet { background: white; box-shadow: var(--shadow); border: 1px solid var(--border); border-radius: 24px; padding: 29px; }
+    .section-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 24px; }
+    .step { width: 35px; height: 35px; border-radius: 11px; background: #e9f5e9; color: #1e6b4d; display: grid; place-items: center; font-weight: 800; font-size: 14px; }
+    .section-heading h2 { margin: 0; font-size: 21px; letter-spacing: -.035em; line-height: 1.2; }
+    .section-heading p { margin: 3px 0 0; font-size: 12px; color: var(--muted); }
+    .form-field { margin-bottom: 25px; }
+    .form-field:last-child { margin-bottom: 0; }
+    .field-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 11px; }
+    .field-top label, .field-top .label { font-size: 14px; font-weight: 790; }
+    .hintbadge { font-size: 11px; font-weight: 750; color: #47755d; background: #eaf4e7; padding: 5px 9px; border-radius: 999px; white-space: nowrap; }
+    .input-wrap { display: flex; align-items: center; border-radius: 15px; border: 1.4px solid #dae5dc; background: #fbfcfa; transition: border-color .2s, box-shadow .2s; }
+    .input-wrap:focus-within { border-color: #58a47a; box-shadow: 0 0 0 4px rgba(37,120,90,.1); }
+    .input-prefix, .input-suffix { font-weight: 800; color: var(--forest-light); padding: 0 15px; font-size: 16px; }
+    .input-wrap input { min-width: 0; width: 100%; border: 0; outline: none; background: transparent; font-size: 23px; font-weight: 760; letter-spacing: -.045em; color: var(--forest); padding: 16px 0; font-variant-numeric: tabular-nums; }
+    .input-wrap input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+    .input-wrap input::-webkit-outer-spin-button, .input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .input-suffix { margin-left: auto; padding-right: 17px; }
+    .small-note { margin-top: 9px; font-size: 12px; color: var(--muted); }
+    .control-row { display: grid; grid-template-columns: 125px 1fr; align-items: center; gap: 18px; }
+    .slider { width: 100%; appearance: none; -webkit-appearance: none; height: 7px; background: linear-gradient(90deg, #2b8a61 var(--fill, 40%), #e8eee8 var(--fill, 40%)); border-radius: 99px; outline: 0; cursor: pointer; }
+    .slider::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 21px; height: 21px; border-radius: 50%; background: var(--forest); border: 4px solid white; box-shadow: 0 0 0 2px var(--forest); }
+    .slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: var(--forest); border: 4px solid white; box-shadow: 0 0 0 2px var(--forest); }
+    .range-labels { display: flex; justify-content: space-between; font-size: 11px; color: #80938a; margin-top: 7px; }
+    .presets { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+    .preset { border: 1px solid #dfebe1; color: #507161; background: white; padding: 7px 12px; border-radius: 30px; font-weight: 720; font-size: 12px; transition: all .15s ease; }
+    .preset:hover, .preset[aria-pressed="true"] { border-color: #2b7f58; background: #e7f3e8; color: #175439; }
+    .form-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-top: 26px; border-top: 1px solid var(--border); padding-top: 21px; gap: 12px; }
+    .action-link { appearance: none; background: transparent; border: 0; color: #3a725c; font-weight: 750; padding: 10px 0; display: inline-flex; align-items: center; gap: 8px; }
+    .responsive-hint { font-size: 11px; color: #8a9a90; }
+    .result-card { border-radius: 24px; background: var(--forest-deep); color: white; padding: 29px; box-shadow: 0 19px 55px rgba(7,52,38,.18); position: relative; overflow: hidden; }
+    .result-card::after { content:""; position:absolute; width:230px; height:230px; border-radius:50%; border: 1px solid rgba(216,243,141,.12); right:-145px; bottom:-85px; box-shadow:0 0 0 32px rgba(216,243,141,.04); pointer-events:none; }
+    .result-card > * { position: relative; z-index: 1; }
+    .result-eyebrow { font-size: 12px; color: #bed8c7; letter-spacing: .12em; font-weight: 780; text-transform: uppercase; }
+    .result-label { margin-top: 30px; font-size: 15px; font-weight: 620; color: #c7ded0; }
+    .result-amount { font-size: clamp(29px, 3.35vw, 46px); line-height: 1.1; font-weight: 840; letter-spacing: -.055em; color: var(--lime); margin-top: 10px; word-break: break-word; font-variant-numeric: tabular-nums; }
+    .per-month { color: #d3e0d5; font-size: 13px; margin-top: 5px; }
+    .result-divider { border-top: 1px solid rgba(255,255,255,.16); margin: 26px 0; }
+    .breakdown { display: grid; gap: 14px; }
+    .breakdown-row { display: flex; justify-content: space-between; gap: 15px; align-items: baseline; font-size: 13px; color: #c9d9cf; }
+    .breakdown-row strong { color: #fff; font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+    .breakdown-row.emph { font-size: 14px; color: #fff; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,.19); }
+    .breakdown-row.emph strong { font-size: 18px; color: var(--lime); }
+    .bar-legend { margin-top: 22px; }
+    .splitbar { width: 100%; height: 11px; background: #a0c885; border-radius: 99px; overflow: hidden; display: flex; }
+    .splitbar span { display: block; background: var(--lime); width: 91%; border-radius: 99px; transition: width .24s ease; }
+    .legend { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 12px; font-size: 11px; color: #d2e0d5; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+    .result-foot { background: rgba(255,255,255,.07); color: #d4e4d6; border-radius: 13px; font-size: 12px; line-height: 1.6; padding: 13px; margin-top: 22px; }
+    .result-actions { display: flex; gap: 9px; margin-top: 16px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 0; padding: 12px 14px; font-weight: 780; font-size: 13px; flex: 1; min-height: 45px; }
+    .btn-primary { background: var(--lime); color: #203c29; }
+    .btn-primary:hover { background: #e4faa5; }
+    .btn-outline { border: 1px solid rgba(255,255,255,.25); color: #f2fff5; background: transparent; }
+    .btn-outline:hover { background: rgba(255,255,255,.08); }
+    .btn:disabled { opacity: .48; cursor: not-allowed; }
+    .lower { display: grid; grid-template-columns: 1.15fr .85fr; gap: 18px; margin: 22px 0 34px; }
+    .info-box { border-radius: 21px; padding: 23px; border: 1px solid var(--border); background: #fff; }
+    .info-box.tint { background: #e9f2e9; border-color: #deebdc; }
+    .info-box h3 { margin: 0 0 9px; font-size: 15px; display: flex; align-items: center; gap: 9px; letter-spacing: -.01em; }
+    .info-box p { margin: 0; color: #687e70; font-size: 13px; line-height: 1.75; }
+    .formula { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; color: #1d5f44; font-size: 12px; margin: 13px 0 0; padding: 11px 12px; background: #f4faf2; border-radius: 11px; overflow-wrap: anywhere; }
+    .footer { display: flex; justify-content: space-between; gap: 15px; padding: 18px 0 39px; color: #7c8d83; font-size: 12px; border-top: 1px solid #e2eae1; }
+    #toast { position: fixed; bottom: 23px; left: 50%; transform: translate(-50%,15px); opacity: 0; pointer-events:none; background:#183d31; color:white; padding:11px 18px; border-radius:99px; font-weight:710; box-shadow: 0 10px 40px rgba(5,40,25,.2); transition: opacity .18s, transform .18s; z-index: 30; max-width: calc(100% - 32px); text-align:center; }
+    #toast.visible { opacity: 1; transform: translate(-50%,0); }
+    .error { font-size: 12px; color: #b5382d; margin-top: 8px; min-height: 0; }
+    @media (max-width: 820px) { .content, .lower { grid-template-columns: 1fr; } .topnav a:not(.pill) { display: none; } .hero { padding: 34px 30px; } }
+    @media (max-width: 490px) {
+      .product-switch { grid-template-columns: 1fr; gap:10px; }
+      .product-choice { padding:14px 16px; }
+      .layout { width: min(100% - 28px, 1160px); }
+      .topbar { height: 74px; }
+      .topnav .pill { font-size: 12px; padding: 9px 12px; }
+      .hero { padding: 30px 23px; border-radius: 22px; }
+      .hero::after { right: -180px; }
+      .hero p { font-size: 14px; }
+      .sheet, .result-card { padding: 22px; border-radius: 20px; }
+      .control-row { grid-template-columns: 112px 1fr; gap: 15px; }
+      .input-wrap input { font-size: 21px; }
+      .result-actions { flex-wrap: wrap; }
+      .footer { flex-direction:column; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+    @media print {
+      body { background: #fff; color: #000; }
+      .layout { width: 100%; }
+      .topbar { height: auto; padding: 0 0 12px; }
+      .topnav, .hero .microtag, .presets, .slider, .form-bottom, .result-actions, .product-switch, #toast { display: none !important; }
+      .hero { padding: 16px; border-radius: 12px; min-height: auto; print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+      .content, .lower { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 12px; }
+      .sheet, .result-card, .info-box { box-shadow: none; padding: 18px; break-inside: avoid; }
+      .result-card { print-color-adjust:exact; -webkit-print-color-adjust: exact; }
+      .footer { padding: 12px 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="layout topbar">
+    <a href="#atas" class="brand" aria-label="KOPIN, kembali ke atas">
+      <span class="brandmark" aria-hidden="true">K</span>
+      <span class="brandname">KOPIN<small>KOPERASI ITJEN</small></span>
+    </a>
+    <nav class="topnav" aria-label="Navigasi halaman">
+      <a href="#simulator">Pilih layanan</a>
+      <a href="#cara-hitung">Cara menghitung</a>
+      <a class="pill" href="#catatan">Catatan penting ↗</a>
+    </nav>
+  </header>
+
+  <main class="layout" id="atas">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="overline">KOPIN / KALKULATOR ANGSURAN</div>
+      <h1 id="hero-title">Hitung cicilan, rencanakan dengan tenang.</h1>
+      <p>Pilih simulasi pembiayaan barang atau pinjaman tunai. Isi nominal dan tenor sesuai kebutuhan, lalu lihat estimasi angsuran serta rincian biayanya secara otomatis.</p>
+      <div class="microtag">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m5 12 4 4L19 6"/></svg>
+        Mudah digunakan · Tanpa login · Tanpa mengirim data
+      </div>
+    </section>
+
+    <div class="product-switch" id="simulator" role="group" aria-label="Pilih jenis layanan">
+      <button type="button" class="product-choice" id="pilihBarang" aria-pressed="true" aria-controls="barangFields">
+        <span class="choice-title"><span class="choice-icon" aria-hidden="true">▣</span> Pembiayaan Barang</span>
+        <span class="choice-caption">Harga pokok + margin total 0–25% · tenor hingga 60 bulan</span>
+      </button>
+      <button type="button" class="product-choice" id="pilihTunai" aria-pressed="false" aria-controls="tunaiFields">
+        <span class="choice-title"><span class="choice-icon" aria-hidden="true">Rp</span> Pinjaman Tunai</span>
+        <span class="choice-caption">Maksimal Rp20 juta · tanpa bunga · admin Rp25.000/bulan · hingga 12 bulan</span>
+      </button>
+    </div>
+
+    <div class="content">
+      <section class="sheet" aria-labelledby="form-title">
+        <div class="section-heading">
+          <div class="step">01</div>
+          <div><h2 id="form-title">Detail pembiayaan barang</h2><p id="form-subtitle">Sesuaikan angka dengan kebutuhan Anda</p></div>
+        </div>
+
+        <div id="barangFields">
+        <div class="form-field">
+          <div class="field-top"><label for="hargaPokok">Harga pokok barang</label><span class="hintbadge">Isi manual</span></div>
+          <div class="input-wrap">
+            <span class="input-prefix" aria-hidden="true">Rp</span>
+            <input id="hargaPokok" type="text" inputmode="numeric" autocomplete="off" value="20.000.000" placeholder="Masukkan harga pokok" aria-describedby="hargaNote hargaError">
+          </div>
+          <div class="small-note" id="hargaNote">Contoh awal Rp20.000.000; silakan ganti dengan harga barang yang diinginkan.</div>
+          <div class="error" id="hargaError" role="status"></div>
+        </div>
+
+        <div class="form-field">
+          <div class="field-top"><label for="margin">Margin keuntungan KOPIN</label><span class="hintbadge">Maksimal 25%</span></div>
+          <div class="control-row">
+            <div class="input-wrap"><input id="margin" type="number" min="0" max="25" step="0.1" value="10" aria-describedby="marginNote" style="padding-left:16px;"><span class="input-suffix">%</span></div>
+            <div>
+              <input class="slider" id="marginSlider" type="range" min="0" max="25" step="0.1" value="10" aria-label="Atur margin keuntungan" style="--fill:40%;">
+              <div class="range-labels"><span>0%</span><span>25%</span></div>
+            </div>
+          </div>
+          <div class="presets" id="marginPresets" aria-label="Pilihan margin cepat">
+            <button type="button" class="preset" data-margin="5">5%</button>
+            <button type="button" class="preset" data-margin="10">10%</button>
+            <button type="button" class="preset" data-margin="15">15%</button>
+            <button type="button" class="preset" data-margin="20">20%</button>
+            <button type="button" class="preset" data-margin="25">25%</button>
+          </div>
+          <div class="small-note" id="marginNote">Margin merupakan <strong>persentase total satu kali</strong> dari harga pokok, bukan persentase per bulan atau per tahun.</div>
+        </div>
+
+        <div class="form-field">
+          <div class="field-top"><label for="tenor">Tenor pembiayaan</label><span class="hintbadge">Maksimal 60 bulan</span></div>
+          <div class="control-row">
+            <div class="input-wrap"><input id="tenor" type="number" min="1" max="60" step="1" value="24" aria-describedby="tenorNote" style="padding-left:16px;"><span class="input-suffix" style="font-size:12px;">bulan</span></div>
+            <div>
+              <input class="slider" id="tenorSlider" type="range" min="1" max="60" step="1" value="24" aria-label="Atur tenor pembiayaan" style="--fill:39%;">
+              <div class="range-labels"><span>1 bulan</span><span>60 bulan</span></div>
+            </div>
+          </div>
+          <div class="presets" id="tenorPresets" aria-label="Pilihan tenor cepat">
+            <button type="button" class="preset" data-tenor="6">6 bln</button>
+            <button type="button" class="preset" data-tenor="12">12 bln</button>
+            <button type="button" class="preset" data-tenor="24">24 bln</button>
+            <button type="button" class="preset" data-tenor="36">36 bln</button>
+            <button type="button" class="preset" data-tenor="48">48 bln</button>
+            <button type="button" class="preset" data-tenor="60">60 bln</button>
+          </div>
+          <div class="small-note" id="tenorNote">Angsuran dibagi merata selama tenor. Pembulatan rupiah dapat membuat angsuran terakhir sedikit berbeda.</div>
+        </div>
+        </div>
+
+        <div id="tunaiFields" hidden>
+          <div class="form-field">
+            <div class="field-top"><label for="nominalTunai">Nominal pinjaman tunai</label><span class="hintbadge">Maksimal Rp20 juta</span></div>
+            <div class="input-wrap">
+              <span class="input-prefix" aria-hidden="true">Rp</span>
+              <input id="nominalTunai" type="text" inputmode="numeric" autocomplete="off" value="10.000.000" placeholder="Masukkan nominal pinjaman" aria-describedby="tunaiNote tunaiError">
+            </div>
+            <div class="small-note" id="tunaiNote">Nilai yang dapat disimulasikan Rp0–Rp20.000.000. Masukkan lebih dari Rp0 untuk menghitung cicilan.</div>
+            <div class="error" id="tunaiError" role="status"></div>
+            <div class="presets" id="tunaiNominalPresets" aria-label="Pilihan nominal pinjaman cepat">
+              <button type="button" class="preset" data-tunai-nominal="1000000">Rp1 juta</button>
+              <button type="button" class="preset" data-tunai-nominal="5000000">Rp5 juta</button>
+              <button type="button" class="preset" data-tunai-nominal="10000000">Rp10 juta</button>
+              <button type="button" class="preset" data-tunai-nominal="15000000">Rp15 juta</button>
+              <button type="button" class="preset" data-tunai-nominal="20000000">Rp20 juta</button>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <div class="field-top"><label for="tenorTunai">Tenor pinjaman tunai</label><span class="hintbadge">Maksimal 12 bulan</span></div>
+            <div class="control-row">
+              <div class="input-wrap"><input id="tenorTunai" type="number" min="1" max="12" step="1" value="12" aria-describedby="tenorTunaiNote" style="padding-left:16px;"><span class="input-suffix" style="font-size:12px;">bulan</span></div>
+              <div>
+                <input class="slider" id="tenorTunaiSlider" type="range" min="1" max="12" step="1" value="12" aria-label="Atur tenor pinjaman tunai" style="--fill:100%;">
+                <div class="range-labels"><span>1 bulan</span><span>12 bulan</span></div>
+              </div>
+            </div>
+            <div class="presets" id="tenorTunaiPresets" aria-label="Pilihan tenor pinjaman tunai cepat">
+              <button type="button" class="preset" data-tenor-tunai="3">3 bln</button>
+              <button type="button" class="preset" data-tenor-tunai="6">6 bln</button>
+              <button type="button" class="preset" data-tenor-tunai="9">9 bln</button>
+              <button type="button" class="preset" data-tenor-tunai="12">12 bln</button>
+            </div>
+            <div class="small-note" id="tenorTunaiNote">Pokok pinjaman dibagi berdasarkan tenor, ditambah biaya administrasi tetap per bulan.</div>
+          </div>
+
+          <div class="form-field">
+            <div class="field-top"><span class="label">Biaya administrasi</span><span class="hintbadge">Tetap · tanpa bunga</span></div>
+            <div class="admin-fixed"><span>Biaya setiap bulan</span><strong>Rp25.000</strong></div>
+            <div class="disclaimer-mini">Tidak ada bunga dan tidak ada margin keuntungan. Biaya administrasi dihitung sebesar Rp25.000 untuk setiap bulan masa pinjaman.</div>
+          </div>
+        </div>
+
+        <div class="form-bottom">
+          <button type="button" class="action-link" id="resetBtn">↺ &nbsp;Kembalikan ke contoh awal</button>
+          <span class="responsive-hint">Hasil diperbarui otomatis</span>
+        </div>
+      </section>
+
+      <section class="result-card" aria-labelledby="result-title">
+        <div class="result-eyebrow" id="result-title">02 / Hasil pembiayaan barang</div>
+        <div class="result-label">Estimasi angsuran per bulan</div>
+        <div class="result-amount" id="cicilan" aria-live="polite" aria-atomic="true">Rp916.667</div>
+        <div class="per-month">/ bulan selama <strong id="tenorLabel">24 bulan</strong></div>
+
+        <div class="result-divider"></div>
+        <div class="breakdown" id="barangBreakdown">
+          <div class="breakdown-row"><span>Harga pokok</span><strong id="hargaHasil">Rp20.000.000</strong></div>
+          <div class="breakdown-row"><span>Margin total (<span id="persenHasil">10%</span>)</span><strong id="marginHasil">Rp2.000.000</strong></div>
+          <div class="breakdown-row emph"><span>Total harga jual</span><strong id="totalHasil">Rp22.000.000</strong></div>
+        </div>
+        <div class="breakdown" id="tunaiBreakdown" hidden>
+          <div class="breakdown-row"><span>Pokok pinjaman</span><strong id="tunaiPokokHasil">Rp10.000.000</strong></div>
+          <div class="breakdown-row"><span>Bunga</span><strong>Rp0 (0%)</strong></div>
+          <div class="breakdown-row"><span>Administrasi per bulan</span><strong>Rp25.000</strong></div>
+          <div class="breakdown-row"><span>Total administrasi selama tenor</span><strong id="tunaiAdminHasil">Rp300.000</strong></div>
+          <div class="breakdown-row emph"><span>Total pembayaran</span><strong id="tunaiTotalHasil">Rp10.300.000</strong></div>
+        </div>
+
+        <div class="bar-legend" aria-label="Komposisi pokok dan biaya">
+          <div class="splitbar"><span id="pokokBar"></span></div>
+          <div class="legend" id="barangLegend"><span><i class="dot" style="background:#d8f38d;"></i>Harga pokok</span><span><i class="dot" style="background:#a0c885;"></i>Margin KOPIN</span></div>
+          <div class="legend" id="tunaiLegend" hidden><span><i class="dot" style="background:#d8f38d;"></i>Pokok pinjaman</span><span><i class="dot" style="background:#a0c885;"></i>Biaya administrasi</span></div>
+        </div>
+
+        <div class="result-foot" id="resultFoot">Angsuran terakhir dapat disesuaikan sedikit karena pembulatan ke rupiah terdekat.</div>
+        <div class="result-actions">
+          <button type="button" id="copyBtn" class="btn btn-primary" aria-label="Salin hasil simulasi">⧉ &nbsp;Salin hasil</button>
+          <button type="button" id="printBtn" class="btn btn-outline" aria-label="Cetak hasil simulasi">▤ &nbsp;Cetak / PDF</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="lower">
+      <section class="info-box" id="cara-hitung" aria-labelledby="formula-title">
+        <h3 id="formula-title">ⓘ &nbsp;Bagaimana cara menghitungnya?</h3>
+        <div id="barangFormula">
+          <p>Untuk pembiayaan barang, simulasi menggunakan <strong>margin total satu kali</strong> atas harga pokok. Harga jual dibagi dengan jumlah bulan angsuran.</p>
+          <div class="formula">Angsuran / bulan = (Harga pokok × (1 + Margin %)) ÷ Tenor</div>
+        </div>
+        <div id="tunaiFormula" hidden>
+          <p>Untuk pinjaman tunai, tidak ada bunga. Cicilan terdiri dari <strong>pokok pinjaman yang dibagi tenor</strong> dan <strong>biaya administrasi Rp25.000 setiap bulan</strong>.</p>
+          <div class="formula">Cicilan / bulan = (Pokok pinjaman ÷ Tenor) + Rp25.000</div>
+        </div>
+      </section>
+      <section class="info-box tint" id="catatan" aria-labelledby="note-title">
+        <h3 id="note-title">✓ &nbsp;Catatan penting</h3>
+        <p id="barangNote">Ini <strong>simulasi ilustratif</strong>, bukan penawaran atau persetujuan pembiayaan resmi KOPIN. Belum memperhitungkan uang muka, biaya tambahan, atau ketentuan akad. Konfirmasikan margin dan skema resmi kepada pengelola KOPIN.</p>
+        <p id="tunaiNoteDetail" hidden>Ini <strong>simulasi ilustratif</strong> pinjaman tunai, bukan persetujuan pinjaman. Asumsi perhitungan: bunga 0%, biaya administrasi tetap Rp25.000 per bulan, dan tidak ada biaya lain. Pencairan dan ketentuan aktual perlu dikonfirmasi kepada KOPIN.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="layout footer">
+    <span><strong>KOPIN</strong> · Koperasi Itjen</span>
+    <span>Simulasi dapat digunakan langsung di browser. Data tidak disimpan maupun dikirim.</span>
+  </footer>
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+      const $ = id => document.getElementById(id);
+      const rupiah = n => 'Rp' + Math.round(n).toLocaleString('id-ID');
+      const shortDecimal = n => Number(n).toLocaleString('id-ID', { maximumFractionDigits: 1 });
+      const digits = s => String(s).replace(/\D/g, '');
+      const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+      const FEE_PER_MONTH = 25000;
+      const MAX_CASH = 20000000;
+      const harga = $('hargaPokok');
+      const margin = $('margin');
+      const marginSlider = $('marginSlider');
+      const tenor = $('tenor');
+      const tenorSlider = $('tenorSlider');
+      const nominalTunai = $('nominalTunai');
+      const tenorTunai = $('tenorTunai');
+      const tenorTunaiSlider = $('tenorTunaiSlider');
+      let active = 'barang';
+      let state = null;
+      let toastTimeout;
+
+      function setRangeFill(range) {
+        const span = Number(range.max) - Number(range.min);
+        const fill = span > 0 ? (Number(range.value) - Number(range.min)) / span * 100 : 0;
+        range.style.setProperty('--fill', fill + '%');
+      }
+
+      function updatePresets() {
+        const groups = [
+          ['data-margin', margin.value],
+          ['data-tenor', tenor.value],
+          ['data-tunai-nominal', digits(nominalTunai.value)],
+          ['data-tenor-tunai', tenorTunai.value]
+        ];
+        for (const [attr, value] of groups) {
+          document.querySelectorAll('[' + attr + ']').forEach(b => {
+            b.setAttribute('aria-pressed', String(Number(b.getAttribute(attr)) === Number(value)));
+          });
+        }
+      }
+
+      function switchProduct(product) {
+        active = product;
+        const cash = active === 'tunai';
+        $('pilihBarang').setAttribute('aria-pressed', String(!cash));
+        $('pilihTunai').setAttribute('aria-pressed', String(cash));
+        $('barangFields').hidden = cash;
+        $('tunaiFields').hidden = !cash;
+        $('barangBreakdown').hidden = cash;
+        $('tunaiBreakdown').hidden = !cash;
+        $('barangLegend').hidden = cash;
+        $('tunaiLegend').hidden = !cash;
+        $('barangFormula').hidden = cash;
+        $('tunaiFormula').hidden = !cash;
+        $('barangNote').hidden = cash;
+        $('tunaiNoteDetail').hidden = !cash;
+        $('form-title').textContent = cash ? 'Detail pinjaman tunai' : 'Detail pembiayaan barang';
+        $('form-subtitle').textContent = cash ? 'Tanpa bunga, administrasi tetap Rp25.000 per bulan' : 'Sesuaikan angka dengan kebutuhan Anda';
+        $('result-title').textContent = cash ? '02 / Hasil pinjaman tunai' : '02 / Hasil pembiayaan barang';
+        calculate();
+      }
+
+      function updateAmountInput(field) {
+        const input = digits(field.value).replace(/^0+(?=\d)/, '');
+        const numeric = Number(input);
+        field.value = input && Number.isSafeInteger(numeric) ? numeric.toLocaleString('id-ID') : input;
+        calculate();
+      }
+
+      function calculate() {
+        updatePresets();
+        // Jaga agar slider tetap sesuai input manual, termasuk selama pengguna mengetik.
+        const persenSlider = Number(margin.value);
+        const bulanSlider = Number(tenor.value);
+        const tunaiSlider = Number(tenorTunai.value);
+        marginSlider.value = clamp(Number.isFinite(persenSlider) ? persenSlider : 0, 0, 25);
+        tenorSlider.value = clamp(Number.isFinite(bulanSlider) ? bulanSlider : 1, 1, 60);
+        tenorTunaiSlider.value = clamp(Number.isFinite(tunaiSlider) ? tunaiSlider : 1, 1, 12);
+        [marginSlider, tenorSlider, tenorTunaiSlider].forEach(setRangeFill);
+
+        const pokok = Number(digits(harga.value));
+        const persen = Number(margin.value);
+        const bulan = Number(tenor.value);
+        $('hargaError').textContent = !pokok ? 'Masukkan harga pokok terlebih dahulu.' :
+          (!Number.isSafeInteger(pokok) || pokok > 1e13 ? 'Harga pokok terlalu besar untuk simulasi ini.' : '');
+        const hargaValid = pokok > 0 && Number.isSafeInteger(pokok) && pokok <= 1e13 &&
+          Number.isFinite(persen) && margin.value.trim() !== '' && persen >= 0 && persen <= 25 &&
+          Number.isInteger(bulan) && bulan >= 1 && bulan <= 60;
+
+        const cash = Number(digits(nominalTunai.value));
+        const cashMonths = Number(tenorTunai.value);
+        const cashValid = cash > 0 && Number.isSafeInteger(cash) && cash <= MAX_CASH &&
+          tenorTunai.value.trim() !== '' && Number.isInteger(cashMonths) && cashMonths >= 1 && cashMonths <= 12;
+        $('tunaiError').textContent = cash === 0 ? 'Isi nominal pinjaman lebih dari Rp0 untuk melihat hasil.' :
+          (!Number.isSafeInteger(cash) || cash > MAX_CASH ? 'Nominal pinjaman maksimal Rp20.000.000.' : '');
+
+        const valid = active === 'tunai' ? cashValid : hargaValid;
+        $('copyBtn').disabled = $('printBtn').disabled = !valid;
+
+        if (!valid) {
+          state = null;
+          $('cicilan').textContent = '—';
+          $('tenorLabel').textContent = '—';
+          $('pokokBar').style.width = '0%';
+          if (active === 'tunai') {
+            ['tunaiPokokHasil', 'tunaiAdminHasil', 'tunaiTotalHasil'].forEach(id => $(id).textContent = '—');
+            $('resultFoot').textContent = 'Masukkan nominal Rp1–Rp20.000.000 dan tenor 1–12 bulan untuk melihat hasil.';
+          } else {
+            ['hargaHasil', 'marginHasil', 'totalHasil'].forEach(id => $(id).textContent = '—');
+            $('persenHasil').textContent = '—';
+            $('resultFoot').textContent = 'Isi harga pokok, margin 0–25%, dan tenor 1–60 bulan untuk melihat hasil.';
+          }
+          return;
+        }
+
+        if (active === 'tunai') {
+          const adminTotal = FEE_PER_MONTH * cashMonths;
+          const totalBayar = cash + adminTotal;
+          const pokokPerBulan = Math.round(cash / cashMonths);
+          const angsuran = pokokPerBulan + FEE_PER_MONTH;
+          const terakhir = (cash - pokokPerBulan * (cashMonths - 1)) + FEE_PER_MONTH;
+          state = { type: 'tunai', cash, bulan: cashMonths, adminTotal, totalBayar, angsuran, terakhir };
+          $('cicilan').textContent = rupiah(angsuran);
+          $('tenorLabel').textContent = cashMonths + ' bulan';
+          $('tunaiPokokHasil').textContent = rupiah(cash);
+          $('tunaiAdminHasil').textContent = rupiah(adminTotal);
+          $('tunaiTotalHasil').textContent = rupiah(totalBayar);
+          $('pokokBar').style.width = (100 * cash / totalBayar).toFixed(3) + '%';
+          $('resultFoot').textContent = terakhir === angsuran
+            ? 'Cicilan sudah termasuk administrasi Rp25.000 setiap bulan. Tidak ada bunga.'
+            : (cashMonths - 1) + ' cicilan pertama masing-masing ' + rupiah(angsuran) +
+              ', dan cicilan terakhir ' + rupiah(terakhir) +
+              ' setelah pembulatan pokok. Semua cicilan sudah termasuk administrasi Rp25.000 per bulan. Tanpa bunga.';
+        } else {
+          const totalMargin = Math.round(pokok * persen / 100);
+          const hargaJual = pokok + totalMargin;
+          const angsuran = Math.round(hargaJual / bulan);
+          const terakhir = hargaJual - (angsuran * (bulan - 1));
+          state = { type: 'barang', pokok, persen, bulan, totalMargin, hargaJual, angsuran, terakhir };
+          $('cicilan').textContent = rupiah(angsuran);
+          $('tenorLabel').textContent = bulan + ' bulan';
+          $('hargaHasil').textContent = rupiah(pokok);
+          $('persenHasil').textContent = shortDecimal(persen) + '%';
+          $('marginHasil').textContent = rupiah(totalMargin);
+          $('totalHasil').textContent = rupiah(hargaJual);
+          $('pokokBar').style.width = (100 * pokok / hargaJual).toFixed(3) + '%';
+          $('resultFoot').textContent = terakhir === angsuran
+            ? 'Seluruh angsuran bernilai sama. Hasil hanya ilustrasi dan perlu dikonfirmasi kepada KOPIN.'
+            : (bulan - 1) + ' angsuran pertama masing-masing ' + rupiah(angsuran) +
+              ', dan angsuran terakhir ' + rupiah(terakhir) +
+              ' untuk menyesuaikan pembulatan rupiah. Hasil hanya ilustrasi.';
+        }
+      }
+
+      harga.addEventListener('input', () => updateAmountInput(harga));
+      nominalTunai.addEventListener('input', () => updateAmountInput(nominalTunai));
+      margin.addEventListener('input', calculate);
+      tenor.addEventListener('input', calculate);
+      tenorTunai.addEventListener('input', calculate);
+      function normalize(field, minimum, maximum, step) {
+        if (field.value.trim() === '') return calculate();
+        let n = Number(field.value);
+        if (!Number.isFinite(n)) n = minimum;
+        n = clamp(n, minimum, maximum);
+        n = Math.round(n / step) * step;
+        field.value = Number(n.toFixed(2));
+        calculate();
+      }
+      margin.addEventListener('change', () => normalize(margin, 0, 25, .1));
+      tenor.addEventListener('change', () => normalize(tenor, 1, 60, 1));
+      tenorTunai.addEventListener('change', () => normalize(tenorTunai, 1, 12, 1));
+      marginSlider.addEventListener('input', () => { margin.value = marginSlider.value; calculate(); });
+      tenorSlider.addEventListener('input', () => { tenor.value = tenorSlider.value; calculate(); });
+      tenorTunaiSlider.addEventListener('input', () => { tenorTunai.value = tenorTunaiSlider.value; calculate(); });
+      document.querySelectorAll('[data-margin]').forEach(b => b.addEventListener('click', () => { margin.value = b.dataset.margin; calculate(); }));
+      document.querySelectorAll('[data-tenor]').forEach(b => b.addEventListener('click', () => { tenor.value = b.dataset.tenor; calculate(); }));
+      document.querySelectorAll('[data-tunai-nominal]').forEach(b => b.addEventListener('click', () => {
+        nominalTunai.value = Number(b.dataset.tunaiNominal).toLocaleString('id-ID'); calculate();
+      }));
+      document.querySelectorAll('[data-tenor-tunai]').forEach(b => b.addEventListener('click', () => { tenorTunai.value = b.dataset.tenorTunai; calculate(); }));
+      $('pilihBarang').addEventListener('click', () => switchProduct('barang'));
+      $('pilihTunai').addEventListener('click', () => switchProduct('tunai'));
+      $('resetBtn').addEventListener('click', () => {
+        if (active === 'tunai') { nominalTunai.value = '10.000.000'; tenorTunai.value = '12'; }
+        else { harga.value = '20.000.000'; margin.value = '10'; tenor.value = '24'; }
+        calculate();
+        showToast('Simulasi kembali ke contoh awal');
+      });
+
+      function resultText() {
+        if (!state) return '';
+        const s = state;
+        if (s.type === 'tunai') {
+          return 'SIMULASI PINJAMAN TUNAI KOPIN\n' +
+            'Nominal pinjaman: ' + rupiah(s.cash) + '\n' +
+            'Bunga: 0% (Rp0)\n' +
+            'Tenor: ' + s.bulan + ' bulan\n' +
+            'Administrasi per bulan: ' + rupiah(FEE_PER_MONTH) + '\n' +
+            'Total administrasi: ' + rupiah(s.adminTotal) + '\n' +
+            'Total pembayaran: ' + rupiah(s.totalBayar) + '\n' +
+            'Estimasi cicilan per bulan: ' + rupiah(s.angsuran) + '\n' +
+            (s.terakhir !== s.angsuran ? 'Cicilan terakhir setelah pembulatan: ' + rupiah(s.terakhir) + '\n' : '') +
+            '\nSimulasi ilustratif, bukan persetujuan pinjaman resmi KOPIN.';
+        }
+        return 'SIMULASI PEMBIAYAAN BARANG KOPIN\n' +
+          'Harga pokok: ' + rupiah(s.pokok) + '\n' +
+          'Margin total: ' + shortDecimal(s.persen) + '% (' + rupiah(s.totalMargin) + ')\n' +
+          'Tenor: ' + s.bulan + ' bulan\n' +
+          'Harga jual: ' + rupiah(s.hargaJual) + '\n' +
+          'Estimasi angsuran per bulan: ' + rupiah(s.angsuran) + '\n' +
+          (s.terakhir !== s.angsuran ? 'Angsuran terakhir setelah pembulatan: ' + rupiah(s.terakhir) + '\n' : '') +
+          '\nSimulasi ilustratif: margin total satu kali dari harga pokok, belum termasuk uang muka/biaya lainnya, bukan penawaran resmi KOPIN.';
+      }
+      async function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+        const el = document.createElement('textarea');
+        el.value = text;
+        el.style.position = 'fixed';
+        el.style.opacity = '0';
+        document.body.appendChild(el);
+        el.focus(); el.select();
+        const ok = document.execCommand('copy');
+        el.remove();
+        if (!ok) throw new Error('Tidak dapat menyalin');
+      }
+      function showToast(message) {
+        const el = $('toast');
+        el.textContent = message;
+        el.classList.add('visible');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => el.classList.remove('visible'), 2500);
+      }
+      $('copyBtn').addEventListener('click', async () => {
+        if (!state) return;
+        try { await copyText(resultText()); showToast('Hasil simulasi berhasil disalin'); }
+        catch (e) { showToast('Gagal menyalin. Coba gunakan Cetak / PDF.'); }
+      });
+      $('printBtn').addEventListener('click', () => { if (state) window.print(); });
+      switchProduct('barang');
+    })();
+  </script>
+</body>
+</html>
